@@ -19,7 +19,7 @@ class Asteroids : public GameSession, public IKeyboardListener, public IGameWorl
 public:
 	Asteroids(int argc, char *argv[]);
 	virtual ~Asteroids(void);
-
+	
 	virtual void Start(void);
 	virtual void Stop(void);
 
