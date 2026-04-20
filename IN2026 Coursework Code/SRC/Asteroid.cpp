@@ -86,6 +86,18 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			} 
 			
 		}
+		else if (other->GetType() == GameObjectType("Bullet"))
+		{
+			mHitByBullet = true;
+			mWorld->FlagForRemoval(GetThisPtr());
+		}
+		
+		else if (other->GetType() == GameObjectType("Ship"))
+		{
+			mHitByBullet = true;
+			mWorld->FlagForRemoval(GetThisPtr());
+		}
+		  
 		else{
 			mWorld->FlagForRemoval(GetThisPtr());
 			

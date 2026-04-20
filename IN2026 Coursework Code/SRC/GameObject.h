@@ -1,6 +1,8 @@
 #ifndef __GAMEOBJECT_H__
 #define __GAMEOBJECT_H__
 
+
+
 #include "GameObjectType.h"
 #include "GameUtil.h"
 #include "GameWorld.h"
@@ -59,6 +61,7 @@ public:
 	void SetBoundingShape(shared_ptr<BoundingShape> bs) { mBoundingShape = bs; }
 
 	shared_ptr<GameObject> GetThisPtr() { return shared_from_this(); }
+
 
 protected:
 	GameObjectType mType;

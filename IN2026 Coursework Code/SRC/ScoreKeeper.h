@@ -20,8 +20,18 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Asteroid")) {
- 			mScore += 10;
-			FireScoreChanged();
+			shared_ptr<Asteroid> asteroid = static_pointer_cast<Asteroid>(object);
+			
+			if (asteroid->getHitByBullet() == true)
+			{
+				if (asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big) {
+					mScore += 10;
+				}
+				else if (asteroid -> getAsteroidSize() == Asteroid::Asteroid_Size::small) {
+					mScore += 20;
+				}
+				FireScoreChanged();
+			}
 		}
 	}
 
@@ -35,7 +45,7 @@ public:
 		// Send message to all listeners
 		for (ScoreListenerList::iterator lit = mListeners.begin(); lit != mListeners.end(); ++lit) {
 			(*lit)->OnScoreChanged(mScore);
-		}
+		} 
 	}
 
 private:

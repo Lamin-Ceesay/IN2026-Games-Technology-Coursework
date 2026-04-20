@@ -55,13 +55,13 @@ void Asteroids::Start()
 	glEnable(GL_LIGHT0);
 
 	Animation *explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
-	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid2_fs.png");
+	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
-	CreateAsteroids(10);
+	CreateAsteroids(2);
 
 	//Create the GUI
 	CreateGUI();
@@ -132,6 +132,8 @@ void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING IGameWorldListener ////////////////////
 
+
+
 void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 {
 	if (object->GetType() == GameObjectType("Asteroid"))
@@ -140,6 +142,31 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetPosition(object->GetPosition());
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
+		
+		shared_ptr<Asteroid> asteroid = static_pointer_cast<Asteroid>(object);
+		if (asteroid-> getHitByBullet() == true)
+		{
+			if (asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big) 
+			{
+			
+			
+				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+				for (int i = 0; i < 2; i++)
+				{
+					shared_ptr<Asteroid> small_asteroid = make_shared<Asteroid>();
+					shared_ptr<Sprite> asteroid_sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+					asteroid_sprite->SetLoopAnimation(true);
+				
+					small_asteroid->setAsteroidSize(Asteroid::Asteroid_Size::small);
+					small_asteroid->SetBoundingShape(make_shared<BoundingSphere>(small_asteroid->GetThisPtr(), 5.0f));
+					small_asteroid->SetScale(0.1f);
+					small_asteroid->SetSprite(asteroid_sprite);
+					small_asteroid->SetPosition(object->GetPosition());
+					mGameWorld->AddObject(small_asteroid);
+					mAsteroidCount++;
+				}
+			}
+		}
 		mAsteroidCount--;
 		if (mAsteroidCount <= 0) 
 		{ 
@@ -161,7 +188,7 @@ void Asteroids::OnTimer(int value)
 	if (value == START_NEXT_LEVEL)
 	{
 		mLevel++;
-		int num_asteroids = 10 + 2 * mLevel;
+		int num_asteroids = 2 + 0.2 * mLevel;
 		CreateAsteroids(num_asteroids);
 	}
 
@@ -205,7 +232,12 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 		shared_ptr<Sprite> asteroid_sprite
 			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 		asteroid_sprite->SetLoopAnimation(true);
-		shared_ptr<GameObject> asteroid = make_shared<Asteroid>();
+		
+		shared_ptr<Asteroid> asteroid = make_shared<Asteroid>();
+		
+		//sets created asteroids as big
+		asteroid -> setAsteroidSize(Asteroid::Asteroid_Size::big);
+		
 		asteroid->SetBoundingShape(make_shared<BoundingSphere>(asteroid->GetThisPtr(), 10.0f));
 		asteroid->SetSprite(asteroid_sprite);
 		asteroid->SetScale(0.2f);
