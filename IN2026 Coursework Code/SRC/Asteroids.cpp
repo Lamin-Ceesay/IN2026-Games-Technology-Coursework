@@ -181,8 +181,15 @@ void Asteroids::OnTimer(int value)
 {
 	if (value == CREATE_NEW_PLAYER)
 	{
+		mSpaceship->SetInvincibility(true);
 		mSpaceship->Reset();
 		mGameWorld->AddObject(mSpaceship);
+		SetTimer(2000, END_INVINCIBILITY);
+	}
+	
+	if (value == END_INVINCIBILITY)
+	{
+		mSpaceship->SetInvincibility(false);
 	}
 
 	if (value == START_NEXT_LEVEL)

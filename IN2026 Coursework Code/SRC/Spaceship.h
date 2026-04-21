@@ -23,12 +23,17 @@ public:
 	void SetSpaceshipShape(shared_ptr<Shape> spaceship_shape) { mSpaceshipShape = spaceship_shape; }
 	void SetThrusterShape(shared_ptr<Shape> thruster_shape) { mThrusterShape = thruster_shape; }
 	void SetBulletShape(shared_ptr<Shape> bullet_shape) { mBulletShape = bullet_shape; }
+	//invincibility so ship doesnt immediately die on respawn
+	void SetInvincibility(bool inv) { mInvincible = inv; }
+	void IsInvincible(bool inv) { mInvincible = inv; }
 
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList &objects);
 
 private:
 	float mThrust;
+	
+	bool mInvincible = false;
 
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;

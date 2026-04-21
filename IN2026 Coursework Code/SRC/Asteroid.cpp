@@ -55,7 +55,8 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 	{
 		shared_ptr<GameObject> other = *i;
 		
-		if (other->GetType() == GameObjectType("Asteroid"))
+		if ((other->GetType() == GameObjectType("Asteroid")
+			|| other->GetType() == GameObjectType("Spaceship")&& asteroid_Size == Asteroid_Size::small))
 		{
 			//gets  current position and velocity of both the colliding asteroids.
 			GLVector3f position1 = GetPosition();
@@ -92,18 +93,14 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			mWorld->FlagForRemoval(GetThisPtr());
 		}
 		
-		else if (other->GetType() == GameObjectType("Ship"))
+		else if (other->GetType() == GameObjectType("Spaceship") && asteroid_Size == Asteroid_Size::big)
 		{
-			mHitByBullet = true;
+			mHitByBullet = false;
 			mWorld->FlagForRemoval(GetThisPtr());
 		}
-		  
-		else{
-			mWorld->FlagForRemoval(GetThisPtr());
-			
 		}
 	}
-}
+
 	
 
 	

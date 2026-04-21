@@ -2,6 +2,8 @@
 #include "GameWorld.h"
 #include "Bullet.h"
 #include "Spaceship.h"
+
+#include "Asteroid.h"
 #include "BoundingSphere.h"
 
 using namespace std;
@@ -94,13 +96,29 @@ void Spaceship::Shoot(void)
 
 bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 {
-	if (o->GetType() != GameObjectType("Asteroid")) return false;
-	if (mBoundingShape.get() == NULL) return false;
-	if (o->GetBoundingShape().get() == NULL) return false;
-	return mBoundingShape->CollisionTest(o->GetBoundingShape());
+	if (o->GetType() == GameObjectType("Asteroid"))
+	{
+		if (mBoundingShape.get() == NULL || o->GetBoundingShape().get() == NULL) return false;
+		return mBoundingShape->CollisionTest(o->GetBoundingShape());
+	}
+	return false;
 }
 
 void Spaceship::OnCollision(const GameObjectList &objects)
 {
-	mWorld->FlagForRemoval(GetThisPtr());
+	// If the ship is invincible, ignore collisions
+	if (mInvincible) return;
+	for (auto i = objects.begin(); i != objects.end(); i++)
+	{
+		shared_ptr<GameObject> obj = *i;
+		if (obj->GetType()  == GameObjectType("Asteroid"))
+		{
+			shared_ptr<Asteroid> asteroid = static_pointer_cast<Asteroid>(obj);
+			if (asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big)
+			{
+				mWorld->FlagForRemoval(GetThisPtr());
+				break;
+			}
+		}
+	}
 }
