@@ -11,6 +11,7 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
+#include "PowerUp.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -58,6 +59,9 @@ void Asteroids::Start()
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
+	Animation *powerup_life_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_life", 64, 256, 64, 64, "HealthPickup.png");
+	Animation *powerup_upgrade_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_upgrade", 64, 256, 64, 64, "Wrench.png");
+	Animation *powerup_invincible_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_invincible", 64, 256, 64, 64, "Box_Item_2.png");
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
@@ -136,6 +140,16 @@ void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 
 void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 {
+	
+	if (object->GetType() == GameObjectType("PowerUp"))
+	{
+		shared_ptr<PowerUp> powerup = static_pointer_cast<PowerUp>(object);
+		if (powerup->getPowerUpType() == PowerUpType::ExtraLife)
+		{
+			mPlayer.AddLives(); 
+		}
+	}
+	
 	if (object->GetType() == GameObjectType("Asteroid"))
 	{
 		shared_ptr<GameObject> explosion = CreateExplosion();
@@ -144,12 +158,38 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		mGameWorld->AddObject(explosion);
 		
 		shared_ptr<Asteroid> asteroid = static_pointer_cast<Asteroid>(object);
-		if (asteroid-> getHitByBullet() == true)
+		if (asteroid-> getHitByBullet() == true && asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big)
 		{
-			if (asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big) 
+				
+			if (rand() % 10 == 0 )
 			{
-			
-			
+				PowerUpType:: Value randomPowerUpType = static_cast<PowerUpType::Value>(rand() % 3);
+				shared_ptr<PowerUp> powerUp = make_shared<PowerUp>(randomPowerUpType);
+				powerUp->SetPosition(object->GetPosition());
+				
+				string animName;
+				if (randomPowerUpType == PowerUpType::ExtraLife)
+				{
+					animName = "powerup_life";
+				}
+				else if (randomPowerUpType == PowerUpType::Upgrade)
+				{
+					animName = "powerup_upgrade";
+				}
+				else if (randomPowerUpType == PowerUpType::Invincible)
+				{
+					animName = "powerup_invincible";
+				}
+				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName(animName);
+				shared_ptr<Sprite> powerup_sprite = make_shared<Sprite>(anim_ptr -> GetWidth(), anim_ptr -> GetHeight(), anim_ptr);
+				powerup_sprite->SetLoopAnimation(true);
+				powerUp->SetSprite(powerup_sprite);
+				powerUp->SetScale(0.15f);
+				powerUp->SetBoundingShape(make_shared<BoundingSphere>(powerUp->GetThisPtr(), 5.0f));
+				
+				mGameWorld->AddObject(powerUp);
+				
+			}
 				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
 				for (int i = 0; i < 2; i++)
 				{
@@ -166,7 +206,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 					mAsteroidCount++;
 				}
 			}
-		}
+		
 		mAsteroidCount--;
 		if (mAsteroidCount <= 0) 
 		{ 
@@ -174,6 +214,8 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		}
 	}
 }
+
+
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING ITimerListener ////////////////////////
 

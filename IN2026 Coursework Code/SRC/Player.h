@@ -39,6 +39,12 @@ public:
 			(*lit)->OnPlayerKilled(mLives);
 		}
 	}
+	
+	void AddLives()
+	{
+		mLives += 1;
+		FirePlayerKilled();
+	}
 
 private:
 	int mLives;
