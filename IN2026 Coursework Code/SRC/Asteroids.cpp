@@ -146,7 +146,10 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		shared_ptr<PowerUp> powerup = static_pointer_cast<PowerUp>(object);
 		if (powerup->getPowerUpType() == PowerUpType::ExtraLife)
 		{
-			mPlayer.AddLives(); 
+			mPlayer.AddLives();
+			std::ostringstream msg_stream;
+			msg_stream << "Lives: " << mPlayer.GetLives();
+			mLivesLabel->SetText(msg_stream.str());
 		}
 	}
 	
@@ -158,24 +161,25 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		mGameWorld->AddObject(explosion);
 		
 		shared_ptr<Asteroid> asteroid = static_pointer_cast<Asteroid>(object);
+		// checks if the big asteroid was hit with a bullet.
+		// makes sure a power up doesnt drop when the ship hits the big asteroid
 		if (asteroid-> getHitByBullet() == true && asteroid->getAsteroidSize() == Asteroid::Asteroid_Size::big)
 		{
-				
-			if (rand() % 10 == 0 )
+				//50% chance for a power up to drop from the big asteroids
+			if (rand() % 2 == 0 )
 			{
+				//picks a random power up to spawn using rand % 3
 				PowerUpType:: Value randomPowerUpType = static_cast<PowerUpType::Value>(rand() % 3);
 				shared_ptr<PowerUp> powerUp = make_shared<PowerUp>(randomPowerUpType);
 				powerUp->SetPosition(object->GetPosition());
+				//does the sprites for the power ups depending on whihc one is picked at random
 				
 				string animName;
 				if (randomPowerUpType == PowerUpType::ExtraLife)
 				{
 					animName = "powerup_life";
 					powerUp->SetScale(0.30f);
-					mPlayer.AddLives();
-					std::ostringstream msg_stream;
-					msg_stream << "Lives: " << mPlayer.GetLives();
-					mLivesLabel->SetText(msg_stream.str());
+
 				}
 				else if (randomPowerUpType == PowerUpType::Upgrade)
 				{
@@ -187,6 +191,8 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 					animName = "powerup_invincible";
 					powerUp->SetScale(0.15f);
 				}
+				
+				
 				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName(animName);
 				shared_ptr<Sprite> powerup_sprite = make_shared<Sprite>(anim_ptr -> GetWidth(), anim_ptr -> GetHeight(), anim_ptr);
 				powerup_sprite->SetLoopAnimation(true);
@@ -200,6 +206,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
 				for (int i = 0; i < 2; i++)
 				{
+					//does animation for the samll asteroids and adds them to the count
 					shared_ptr<Asteroid> small_asteroid = make_shared<Asteroid>();
 					shared_ptr<Sprite> asteroid_sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 					asteroid_sprite->SetLoopAnimation(true);
@@ -233,6 +240,7 @@ void Asteroids::OnTimer(int value)
 		mSpaceship->SetInvincibility(true);
 		mSpaceship->Reset();
 		mGameWorld->AddObject(mSpaceship);
+		//makes player invincible fopr 2 seconds after they lose a life and respawn
 		SetTimer(2000, END_INVINCIBILITY);
 	}
 	
