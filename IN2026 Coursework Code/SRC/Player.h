@@ -43,8 +43,9 @@ public:
 	void AddLives()
 	{
 		mLives += 1;
-		FirePlayerKilled();
 	}
+	
+	int GetLives() { return mLives; }
 
 private:
 	int mLives;

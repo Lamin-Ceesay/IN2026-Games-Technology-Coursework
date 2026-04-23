@@ -59,9 +59,9 @@ void Asteroids::Start()
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
-	Animation *powerup_life_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_life", 64, 256, 64, 64, "HealthPickup.png");
-	Animation *powerup_upgrade_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_upgrade", 64, 256, 64, 64, "Wrench.png");
-	Animation *powerup_invincible_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_invincible", 64, 256, 64, 64, "Box_Item_2.png");
+	Animation *powerup_life_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_life", 64, 64, 64, 64, "HealthPickup.png");
+	Animation *powerup_upgrade_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_upgrade", 99, 116, 99, 116, "wrench.png");
+	Animation *powerup_invincible_anim = AnimationManager::GetInstance().CreateAnimationFromFile("powerup_invincible", 64, 64, 64, 64, "Box_Item_2.png");
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
@@ -171,20 +171,27 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 				if (randomPowerUpType == PowerUpType::ExtraLife)
 				{
 					animName = "powerup_life";
+					powerUp->SetScale(0.30f);
+					mPlayer.AddLives();
+					std::ostringstream msg_stream;
+					msg_stream << "Lives: " << mPlayer.GetLives();
+					mLivesLabel->SetText(msg_stream.str());
 				}
 				else if (randomPowerUpType == PowerUpType::Upgrade)
 				{
 					animName = "powerup_upgrade";
+					powerUp->SetScale(0.15f);
 				}
 				else if (randomPowerUpType == PowerUpType::Invincible)
 				{
 					animName = "powerup_invincible";
+					powerUp->SetScale(0.15f);
 				}
 				Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName(animName);
 				shared_ptr<Sprite> powerup_sprite = make_shared<Sprite>(anim_ptr -> GetWidth(), anim_ptr -> GetHeight(), anim_ptr);
 				powerup_sprite->SetLoopAnimation(true);
 				powerUp->SetSprite(powerup_sprite);
-				powerUp->SetScale(0.15f);
+				
 				powerUp->SetBoundingShape(make_shared<BoundingSphere>(powerUp->GetThisPtr(), 5.0f));
 				
 				mGameWorld->AddObject(powerUp);

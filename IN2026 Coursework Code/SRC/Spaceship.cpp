@@ -39,14 +39,15 @@ Spaceship::~Spaceship(void)
 /** Update this spaceship. */
 void Spaceship::Update(int t)
 {
+	//makes ship invincible for 5 seconds
 	if (mInvincible) {
 		mInvinicibilityTimer += t;
-		if (mInvinicibilityTimer >= 2000) {
+		if (mInvinicibilityTimer >= 5000) {
 			mInvincible = false;
 			mInvinicibilityTimer = 0;
 		}
 	}
-	
+	//makes turning the ship faster and ship stops when not pressing w
 	if (mBetterBrakes && mThrust <= 0) {
 		mVelocity *= 0.98;
 	}
@@ -80,6 +81,7 @@ void Spaceship::Thrust(float t)
 /** Set the rotation. */
 void Spaceship::Rotate(float r)
 {
+	//if youve collected the easier turning powerup, turn faster
 	if (mEasierTurning && r != 0) {
 		mRotation = r * 2.0f;}
 	else{
@@ -135,16 +137,19 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 		if (obj->GetType() == GameObjectType("PowerUp"))
 		{
 			shared_ptr<PowerUp> powerup = static_pointer_cast<PowerUp>(obj);
+			
 			if (powerup->getPowerUpType() == PowerUpType::ExtraLife)
 			{
 				mWorld->FlagForRemoval(obj);
 			}
+			
 			else if (powerup->getPowerUpType() == PowerUpType::Upgrade)
 			{
 				EnableBetterBrakes(true);
 				EnableEasierTurning(true);
 				mWorld->FlagForRemoval(obj);
 			}
+			
 			else if (powerup->getPowerUpType() == PowerUpType::Invincible)
 			{
 				SetInvincibility(true);
